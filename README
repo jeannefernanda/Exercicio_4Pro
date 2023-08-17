@@ -1,0 +1,13 @@
+Como rodar o projeto:
+
+Instalar o MySQL:
+Usuario:root
+Senha:root
+Criar database 'escola'
+Rodar o Script de criação das tabelas do banco de dados 'escola.sql'
+
+Dentro da pasta do projeto digitar no terminal:
+python -m venv venv
+.\venv\Scripts\activate
+pip install -r requirements.txt
+executar o app.py

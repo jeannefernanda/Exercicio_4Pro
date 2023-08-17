@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Lista de Alunos</title>
+    </head>
+    <body>
+        <div><a href="{{ url_for ('index') }}">VOLTAR PARA A PÁGINA INICIAL</a><br></div>
+        <div>
+            <table>
+                <tr>
+                    <th>NOME</th>
+                    <th>CPF</th>
+                    <th>DATA DE NASCIMENTO</th>
+                    <th>ENDEREÇO</th>
+                    <th>TELEFONE</th>
+                    <th>NUMERO DE MATRÍCULA</th>
+                    <th>DATA DE MATRICULA</th>
+                    <th>SPECIAL</th>
+                </tr>
+                {% for aluno in alunos %}
+                <tr>
+                    <td>{{aluno[0]}}</td>
+                    <td>{{aluno[1]}}</td>
+                    <td>{{aluno[2]}}</td>
+                    <td>{{aluno[3]}}</td>
+                    <td>{{aluno[4]}}</td>
+                    <td>{{aluno[5]}}</td>
+                    <td>{{aluno[6]}}</td>
+                    <td>{% if aluno[7] == 0 %}
+                        Sim
+                        {% else %}
+                        Não
+                        {% endif %}
+                    </td>          
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </body>
+</html>

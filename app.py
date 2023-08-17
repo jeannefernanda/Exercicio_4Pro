@@ -16,5 +16,21 @@ db_config = {
 def index():
     return render_template('index.html')
 
+@app.route('/listar_alunos')
+def listar_alunos():
+    conn  = mysql.connector.connect(**db_config)
+    cursor = conn.cursor()
+
+    # Selecionar atributos dos alunos
+    cursor.execute("SELECT nome, cpf, datanascimento, endereco, telefone, numeromatricula, datamatricula, alunoespecial FROM aluno JOIN pessoa ON aluno.codigopessoa = pessoa.codigo")
+    alunos = cursor.fetchall()
+
+    #print(alunos)
+
+    cursor.close()
+    conn.close()
+ 
+    return render_template('listar_alunos.html', alunos=alunos)
+
 if __name__ == '__main__':
     app.run(debug=True)

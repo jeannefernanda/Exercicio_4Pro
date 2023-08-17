@@ -68,6 +68,30 @@ def inserir_aluno():
 
     return render_template('inserir_aluno.html')
 
+@app.route('/relatorio', methods=['GET','POST'])
+def relatorio():
+    
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM curso")
+    cursos = cursor.fetchall()
+
+    if request.method == 'POST':
+        cursor.execute("SELECT * FROM curso")
+        cursor.fetchall()
+
+        # Selecionar alunos por curso
+        id_curso = request.form['curso_id']
+        cursor.execute("SELECT * FROM aluno JOIN pessoa ON aluno.codigopessoa = pessoa.codigo JOIN matricula ON aluno.codigo = matricula.codigoaluno  JOIN turma ON matricula.codigoturma = turma.codigo JOIN curso ON turma.codigocurso = curso.codigo WHERE curso.codigo = %s", (id_curso,))
+        alunos = cursor.fetchall()
+
+        print(alunos)
+
+        return render_template('relatorio.html', alunos=alunos, cursos=cursos)
+
+    return render_template('relatorio.html', cursos=cursos)
+
 if __name__ == '__main__':
     app.run(debug=True)
 

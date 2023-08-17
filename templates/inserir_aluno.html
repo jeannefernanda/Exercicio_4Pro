@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Cadastro de Aluno</title>
+    </head>
+    <body>
+        <a href="{{ url_for('index') }}">VOLTAR PARA A PÁGINA INICIAL</a>
+        <h1>INSERIR ALUNO</h1>
+        <form method="post">
+
+            <label for="nome">NOME:</label>
+            <input type="text" id="nome" name="nome" required><br>
+
+            <label for="cpf">CPF:</label>
+            <input type="text" id="cpf" name="cpf" required><br>
+
+            <label for="datanascimento">DATA DE NASCIMENTO:</label>
+            <input type="text" id="datanascimento" name="datanascimento" required><br>
+
+            <label for="endereco">ENDERECO:</label>
+            <input type="text" id="endereco" name="endereco" required><br>
+
+            <label for="telefone">TELEFONE:</label>
+            <input type="text" id="telefone" name="telefone" required><br>
+
+            <label for="numeromatricula">NUMERO DE MATRÍCULA:</label>
+            <input type="text" id="numeromatricula" name="numeromatricula" required><br>
+
+            <label for="datamatricula">DATA DE MATRÍCULA:</label>
+            <input type="text" id="datamatricula" name="datamatricula" required><br>
+
+            <label>ESPECIAL</label><br>
+            <input type="radio" id="sim" name="especial" value="0" required>
+            <label for="sim">SIM</label>
+            <input type="radio" id="nao" name="especial" value="1" required>
+            <label for="nao">NÃO</label><br>
+            <input type="submit" value="Salvar">
+            
+            
+        </form>
+    </body>
+</html>

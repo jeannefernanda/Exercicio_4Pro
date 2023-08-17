@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Flask, render_template, request
 import mysql.connector
 
@@ -22,7 +23,7 @@ def listar_alunos():
     cursor = conn.cursor()
 
     # Selecionar atributos dos alunos
-    cursor.execute("SELECT nome, cpf, datanascimento, endereco, telefone, numeromatricula, datamatricula, alunoespecial FROM aluno JOIN pessoa ON aluno.codigopessoa = pessoa.codigo")
+    cursor.execute("SELECT nome, cpf, DATE_FORMAT(datanascimento, '%d/%m/%Y'), endereco, telefone, numeromatricula, DATE_FORMAT(datamatricula, '%d/%m/%Y'), alunoespecial FROM aluno JOIN pessoa ON aluno.codigopessoa = pessoa.codigo")
     alunos = cursor.fetchall()
 
     #print(alunos)
@@ -45,12 +46,17 @@ def inserir_aluno():
         datamatricula = request.form['datamatricula']
         alunoespecial = request.form['especial']
 
+        # Convertendo a data para o formato yyyy/mm/dd
+        datanascimento_converted = datetime.strptime(datanascimento, '%d/%m/%Y').strftime('%Y/%m/%d')
+        datamatricula_converted = datetime.strptime(datamatricula, '%d/%m/%Y').strftime('%Y/%m/%d')
+
+
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
 
         # Inserir dados na base de dados
         insert_pessoa_query = "INSERT INTO pessoa (nome, cpf, datanascimento, endereco, telefone) VALUES (%s, %s, %s, %s, %s)"
-        pessoa_values = (nome, cpf, datanascimento, endereco, telefone)
+        pessoa_values = (nome, cpf, datanascimento_converted, endereco, telefone)
         cursor.execute(insert_pessoa_query, pessoa_values)
 
         # Obter o id da pessoa gerada na inserção anterior
@@ -58,7 +64,7 @@ def inserir_aluno():
 
         #Inserir na tabela aluno com a FK referenciando a pessoa
         insert_aluno_query = "INSERT INTO aluno (codigopessoa, numeromatricula, datamatricula, alunoespecial) VALUES (%s, %s, %s, %s)"
-        aluno_values = (pessoa_id, numeromatricula, datamatricula, alunoespecial)
+        aluno_values = (pessoa_id, numeromatricula, datamatricula_converted, alunoespecial)
         cursor.execute(insert_aluno_query, aluno_values)
 
         conn.commit()

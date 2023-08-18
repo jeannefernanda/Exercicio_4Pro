@@ -16,6 +16,7 @@
                     <th>NUMERO DE MATRÍCULA</th>
                     <th>DATA DE MATRICULA</th>
                     <th>SPECIAL</th>
+                    <th></th>
                 </tr>
                 {% for aluno in alunos %}
                 <tr>
@@ -31,7 +32,8 @@
                         {% else %}
                         Não
                         {% endif %}
-                    </td>          
+                    </td>     
+                    <td><a href="{{ url_for ('editar_aluno', codigo=aluno[8]) }}">EDITAR</a></td>     
                 </tr>
                 {% endfor %}
             </table>

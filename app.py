@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Flask, render_template, request
+from flask import Flask, redirect, render_template, request, url_for
 import mysql.connector
 
 app = Flask(__name__)
@@ -23,10 +23,10 @@ def listar_alunos():
     cursor = conn.cursor()
 
     # Selecionar atributos dos alunos
-    cursor.execute("SELECT nome, cpf, DATE_FORMAT(datanascimento, '%d/%m/%Y'), endereco, telefone, numeromatricula, DATE_FORMAT(datamatricula, '%d/%m/%Y'), alunoespecial FROM aluno JOIN pessoa ON aluno.codigopessoa = pessoa.codigo")
+    cursor.execute("SELECT nome, cpf, DATE_FORMAT(datanascimento, '%d/%m/%Y'), endereco, telefone, numeromatricula, DATE_FORMAT(datamatricula, '%d/%m/%Y'), alunoespecial, codigopessoa FROM aluno JOIN pessoa ON aluno.codigopessoa = pessoa.codigo")
     alunos = cursor.fetchall()
 
-    #print(alunos)
+    print(alunos)
 
     cursor.close()
     conn.close()
@@ -97,6 +97,56 @@ def relatorio():
         return render_template('relatorio.html', alunos=alunos, cursos=cursos)
 
     return render_template('relatorio.html', cursos=cursos)
+
+@app.route('/editar_aluno/<int:codigo>', methods=['GET', 'POST'])
+def editar_aluno(codigo):
+    if request.method == 'POST':
+        # Obter os dados do formulário
+        nome = request.form['nome']
+        cpf = request.form['cpf']
+        datanascimento = request.form['datanascimento']
+        endereco = request.form['endereco']
+        telefone = request.form['telefone']
+        numeromatricula = request.form['numeromatricula']
+        datamatricula = request.form['datamatricula']
+        alunoespecial = request.form['especial']
+
+        # Convertendo datas para o formato do banco de dados
+        datanascimento_converted = datetime.strptime(datanascimento, '%d/%m/%Y').strftime('%Y/%m/%d')
+        datamatricula_converted = datetime.strptime(datamatricula, '%d/%m/%Y').strftime('%Y/%m/%d')
+
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        # Atualizar dados na tabela pessoa
+        update_pessoa_query = "UPDATE pessoa SET nome = %s, cpf = %s, datanascimento = %s, endereco = %s, telefone = %s WHERE codigo = %s"
+        pessoa_values = (nome, cpf, datanascimento_converted, endereco, telefone, codigo)
+        cursor.execute(update_pessoa_query, pessoa_values)
+
+        # Atualizar dados na tabela aluno
+        update_aluno_query = "UPDATE aluno SET numeromatricula = %s, datamatricula = %s, alunoespecial = %s WHERE codigopessoa = %s"
+        aluno_values = (numeromatricula, datamatricula_converted, alunoespecial, codigo)
+        cursor.execute(update_aluno_query, aluno_values)
+
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for('listar_alunos'))  # Redirecionar para a lista de alunos após a edição
+    else:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+
+        # Obter dados do aluno a ser editado
+        select_aluno_query = "SELECT p.codigo, p.nome, p.cpf, DATE_FORMAT(p.datanascimento, '%d/%m/%Y'), p.endereco, p.telefone, a.numeromatricula, DATE_FORMAT(a.datamatricula, '%d/%m/%Y'), a.alunoespecial FROM pessoa p JOIN aluno a ON p.codigo = a.codigopessoa WHERE a.codigopessoa = %s"
+        cursor.execute(select_aluno_query, (codigo,))
+        aluno_data = cursor.fetchone()
+
+        conn.close()
+
+        if aluno_data:
+            return render_template('editar_aluno.html', aluno=aluno_data)
+        else:
+            # Aluno não encontrado, lidar com esse caso
+            return "Aluno não encontrado"
 
 if __name__ == '__main__':
     app.run(debug=True)

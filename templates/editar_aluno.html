@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editar Aluno</title>
+</head>
+<body>
+    <h1>Editar Aluno</h1>
+    <form method="post">
+        <!-- Inserir campos do formulário preenchidos com os valores atuais do aluno -->
+        <label for="nome">NOME:</label>
+        <input type="text" name="nome" value="{{ aluno[1] }}" required><br>
+
+        <label for="cpf">CPF:</label>
+        <input type="text" name="cpf" value="{{ aluno[2] }}" required><br>
+
+        <label for="datanascimento">DATA DE NASCIMENTO:</label>
+        <input type="text" name="datanascimento" value="{{ aluno[3] }}" required><br>
+
+        <label for="endereco">ENDEREÇO:</label>
+        <input type="text" name="endereco" value="{{ aluno[4] }}" required><br>
+
+        <label for="telefone">TELEFONE:</label>
+        <input type="text" name="telefone" value="{{ aluno[5] }}" required><br>
+
+        <label for="numeromatricula">NUMERO DE MATRÍCULA:</label>
+        <input type="text" name="numeromatricula" value="{{ aluno[6] }}" required><br>
+
+        <label for="datamatricula">DATA DE MATRÍCULA:</label>
+        <input type="text" name="datamatricula" value="{{ aluno[7] }}" required><br>
+
+        <label>ESPECIAL</label><br>
+            <input type="radio" id="sim" name="especial" value="0" {% if aluno[8] == 0 %}checked{% endif %} required>
+            <label for="sim">SIM</label>
+            <input type="radio" id="nao" name="especial" value="1" {% if aluno[8] == 1 %}checked{% endif %} required>
+            <label for="nao">NÃO</label><br>
+            <input type="submit" value="Salvar">
+
+    </form>
+</body>
+</html>

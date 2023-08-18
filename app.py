@@ -26,7 +26,7 @@ def listar_alunos():
     cursor.execute("SELECT nome, cpf, DATE_FORMAT(datanascimento, '%d/%m/%Y'), endereco, telefone, numeromatricula, DATE_FORMAT(datamatricula, '%d/%m/%Y'), alunoespecial, codigopessoa FROM aluno JOIN pessoa ON aluno.codigopessoa = pessoa.codigo")
     alunos = cursor.fetchall()
 
-    print(alunos)
+    #print(alunos)
 
     cursor.close()
     conn.close()
@@ -92,7 +92,7 @@ def relatorio():
         cursor.execute("SELECT * FROM aluno JOIN pessoa ON aluno.codigopessoa = pessoa.codigo JOIN matricula ON aluno.codigo = matricula.codigoaluno  JOIN turma ON matricula.codigoturma = turma.codigo JOIN curso ON turma.codigocurso = curso.codigo WHERE curso.codigo = %s", (id_curso,))
         alunos = cursor.fetchall()
 
-        print(alunos)
+        #print(alunos)
 
         return render_template('relatorio.html', alunos=alunos, cursos=cursos)
 

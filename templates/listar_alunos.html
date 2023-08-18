@@ -28,9 +28,9 @@
                     <td>{{aluno[5]}}</td>
                     <td>{{aluno[6]}}</td>
                     <td>{% if aluno[7] == 0 %}
-                        Sim
-                        {% else %}
                         Não
+                        {% else %}
+                        Sim
                         {% endif %}
                     </td>     
                     <td><a href="{{ url_for ('editar_aluno', codigo=aluno[8]) }}">EDITAR</a></td>     

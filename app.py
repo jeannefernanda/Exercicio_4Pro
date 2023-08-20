@@ -13,13 +13,20 @@ db_config = {
     'ssl_disabled': True
 }
 
+def get_database_connection():
+    return mysql.connector.connect(**db_config)
+
+def convert_date(date_str):
+    return datetime.strptime(date_str, '%d/%m/%Y').strftime('%Y/%m/%d')
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/listar_alunos')
 def listar_alunos():
-    conn  = mysql.connector.connect(**db_config)
+    conn = get_database_connection()
     cursor = conn.cursor()
 
     # Selecionar atributos dos alunos
@@ -47,8 +54,8 @@ def inserir_aluno():
         alunoespecial = request.form['especial']
 
         # Convertendo a data para o formato yyyy/mm/dd
-        datanascimento_converted = datetime.strptime(datanascimento, '%d/%m/%Y').strftime('%Y/%m/%d')
-        datamatricula_converted = datetime.strptime(datamatricula, '%d/%m/%Y').strftime('%Y/%m/%d')
+        datanascimento_converted = convert_date(datanascimento)
+        datamatricula_converted = convert_date(datamatricula)
 
 
         conn = mysql.connector.connect(**db_config)
@@ -78,7 +85,7 @@ def inserir_aluno():
 @app.route('/relatorio', methods=['GET','POST'])
 def relatorio():
     
-    conn = mysql.connector.connect(**db_config)
+    conn = get_database_connection()
     cursor = conn.cursor()
 
     cursor.execute("SELECT codigo, nome FROM curso")
@@ -107,6 +114,10 @@ def relatorio():
 @app.route('/editar_aluno/<int:codigo>', methods=['GET', 'POST'])
 def editar_aluno(codigo):
     if request.method == 'POST':
+
+        conn = get_database_connection()
+        cursor = conn.cursor()
+
         # Obter os dados do formulário
         nome = request.form['nome']
         cpf = request.form['cpf']
@@ -118,11 +129,9 @@ def editar_aluno(codigo):
         alunoespecial = request.form['especial']
 
         # Convertendo datas para o formato do banco de dados
-        datanascimento_converted = datetime.strptime(datanascimento, '%d/%m/%Y').strftime('%Y/%m/%d')
-        datamatricula_converted = datetime.strptime(datamatricula, '%d/%m/%Y').strftime('%Y/%m/%d')
+        datanascimento_converted = convert_date(datanascimento)
+        datamatricula_converted = convert_date(datamatricula)
 
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor()
         # Atualizar dados na tabela pessoa
         update_pessoa_query = "UPDATE pessoa SET nome = %s, cpf = %s, datanascimento = %s, endereco = %s, telefone = %s WHERE codigo = %s"
         pessoa_values = (nome, cpf, datanascimento_converted, endereco, telefone, codigo)
@@ -134,11 +143,12 @@ def editar_aluno(codigo):
         cursor.execute(update_aluno_query, aluno_values)
 
         conn.commit()
+        cursor.close()
         conn.close()
 
         return redirect(url_for('listar_alunos'))  # Redirecionar para a lista de alunos após a edição
     else:
-        conn = mysql.connector.connect(**db_config)
+        conn = get_database_connection()
         cursor = conn.cursor()
 
         # Obter dados do aluno a ser editado

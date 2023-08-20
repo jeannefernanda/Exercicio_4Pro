@@ -68,7 +68,8 @@ def inserir_aluno():
         cursor.execute(insert_aluno_query, aluno_values)
 
         conn.commit()
-
+        cursor.close()
+        conn.close()
         return render_template('inserir_aluno.html')
 
 
@@ -80,22 +81,27 @@ def relatorio():
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM curso")
+    cursor.execute("SELECT codigo, nome FROM curso")
     cursos = cursor.fetchall()
 
     if request.method == 'POST':
-        cursor.execute("SELECT * FROM curso")
+        cursor.execute("SELECT codigo, nome FROM curso")
         cursor.fetchall()
 
         # Selecionar alunos por curso
         id_curso = request.form['curso_id']
-        cursor.execute("SELECT * FROM aluno JOIN pessoa ON aluno.codigopessoa = pessoa.codigo JOIN matricula ON aluno.codigo = matricula.codigoaluno  JOIN turma ON matricula.codigoturma = turma.codigo JOIN curso ON turma.codigocurso = curso.codigo WHERE curso.codigo = %s", (id_curso,))
+        cursor.execute("SELECT pessoa.nome, cpf, numeromatricula FROM aluno JOIN pessoa ON aluno.codigopessoa = pessoa.codigo JOIN matricula ON aluno.codigo = matricula.codigoaluno JOIN turma ON matricula.codigoturma = turma.codigo JOIN curso ON turma.codigocurso = curso.codigo WHERE curso.codigo = %s", (id_curso,))
         alunos = cursor.fetchall()
 
         #print(alunos)
 
+        cursor.close()
+        conn.close()
+
         return render_template('relatorio.html', alunos=alunos, cursos=cursos)
 
+    cursor.close()
+    conn.close()
     return render_template('relatorio.html', cursos=cursos)
 
 @app.route('/editar_aluno/<int:codigo>', methods=['GET', 'POST'])
@@ -136,10 +142,11 @@ def editar_aluno(codigo):
         cursor = conn.cursor()
 
         # Obter dados do aluno a ser editado
-        select_aluno_query = "SELECT p.codigo, p.nome, p.cpf, DATE_FORMAT(p.datanascimento, '%d/%m/%Y'), p.endereco, p.telefone, a.numeromatricula, DATE_FORMAT(a.datamatricula, '%d/%m/%Y'), a.alunoespecial FROM pessoa p JOIN aluno a ON p.codigo = a.codigopessoa WHERE a.codigopessoa = %s"
-        cursor.execute(select_aluno_query, (codigo,))
+        select_aluno_query = "SELECT nome, cpf, DATE_FORMAT(datanascimento, '%d/%m/%Y'), endereco, telefone, numeromatricula, DATE_FORMAT(datamatricula,'%d/%m/%Y'), alunoespecial FROM aluno JOIN pessoa ON aluno.codigopessoa = pessoa.codigo WHERE aluno.codigopessoa = %s"
+        cursor.execute(select_aluno_query,(codigo,))
         aluno_data = cursor.fetchone()
 
+        cursor.close()
         conn.close()
 
         if aluno_data:
